@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script>
+window.onload=function(){
+let xhr=new XMLHttpRequest();
+const urlParams=new URLSearchParams(window.location.search);
+let id=urlParams.get('id');
+xhr.open('GET','/details?id='+id);
+xhr.onreadystatechange=function(){
+if(xhr.readyState==4&&xhr.status==200)
+{
+let responseObj=xhr.response;
+//responseObj=JSON.parse(responseObj);
+console.log(responseObj[0].username)
+console.log(responseObj[0].username);
+let username=responseObj[0].username;
+let password=responseObj[0].password;
+let email=responseObj[0].email;
+let address=responseObj[0].address;
+//console.log()
+document.getElementById("un").value=username;
+document.getElementById("pswd").value=password;
+document.getElementById("id1").value=id;
+document.getElementById("eml").value=email;
+document.getElementById("ad").value=address;
+}
+}
+let token=localStorage.getItem('unique_token');
+xhr.setRequestHeader('Authorization','JWT '+token);
+xhr.responseType='json';
+xhr.send()
+}
+function myfunction(e)
+{
+alert('heii');
+let xhr=new XMLHttpRequest();
+let username=document.getElementById('un').value.trim();
+let password=document.getElementById('pswd').value;
+let email=document.getElementById('eml').value;
+let id=document.getElementById('id1').value;
+let address=document.getElementById('ad').value;
+let json=JSON.stringify({
+"username":username,
+"email":email,
+"password":password,
+"id":id,
+"address":address
+});
+xhr.onreadystatechange=function(){
+if(this.readyState==4 && this.status==200)
+{
+document.getElementById("result").innerHTML="<h4>Information updated</h4>";
+}
+};
+xhr.open('PUT','/update_user');
+let token=localStorage.getItem('unique_token');
+xhr.setRequestHeader('Authorization','JWT '+token);
+//xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+xhr.responseType='json'
+xhr.send(json);
+}
+</script>
+</head>
+<body>
+<center>
+<h1>Update</h1>
+
+<input type='hidden' id='id1'>
+Enter your username <input type='text' id='un'><br>
+Enter your Password <input type='password'   id='pswd' ><br>
+Enter your Email <input type='email' id='eml'><br>
+Enter your Address <input type='text' id='ad'><br>
+<button type='button' onclick='myfunction(this)'>Update</button>
+</center>
+<div id='result'></div>
+</body>
+</html>

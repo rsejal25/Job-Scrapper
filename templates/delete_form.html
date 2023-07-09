@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+window.onload=function(){
+let xhr=new XMLHttpRequest();
+const urlParams=new URLSearchParams(window.location.search);
+let id=urlParams.get('id');
+xhr.open('GET','/details?id='+id);
+xhr.onreadystatechange=function(){
+if(xhr.readyState==4&&xhr.status==200)
+{
+let responseObj=xhr.response;
+console.log(responseObj)
+console.log(responseObj[0].username);
+let username=responseObj[0].username;
+let password=responseObj[0].password;
+let address=responseObj[0].address;
+let email=responseObj[0].email;
+document.getElementById("un").value=username;
+document.getElementById("pswd").value=password;
+document.getElementById("id1").value=id;
+document.getElementById("eml").value=email;
+document.getElementById("ad").value=address;
+}
+}
+let token=localStorage.getItem('unique_token');
+xhr.setRequestHeader('Authorization','JWT '+token);
+console.log('token',token);
+xhr.responseType='json';
+xhr.send();
+}
+function myfunction(e)
+{
+alert('heii');
+let xhr=new XMLHttpRequest();
+let username=document.getElementById('un').value.trim();
+let password=document.getElementById('pswd').value;
+let email=document.getElementById('eml').value;
+let id=document.getElementById('id1').value;
+let json=JSON.stringify({
+"name":username,
+"email":email,
+"password":password,
+"id":id
+});
+xhr.onreadystatechange=function(){
+if(this.readyState==4 && this.status==200)
+{
+document.getElementById('result').innerHTML="User deleted";
+}
+};
+xhr.open('DELETE','/delete?id='+id);
+let token=localStorage.getItem('unique_token');
+xhr.setRequestHeader('Authorization','JWT '+token);
+//xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+xhr.send();
+}
+</script>
+</head>
+<body>
+<center>
+<h1>Delete</h1>
+<input type='hidden' id='id1'>
+Enter your username <input type='text' id='un'><br><br>
+Enter your Password <input type='password'   id='pswd' ><br><br>
+Enter your Email <input type='email' id='eml'><br><br>
+Enter your Address <input type='text' id='ad'><br><br>
+<button type='button' onclick='myfunction(this)'>Delete</button>
+</center>
+<div id='result'></div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script>
+function searchButtonHandler(){
+document.getElementById('search_page').submit();
+}
+function profileButtonHandler(){
+document.getElementById('view_profile').submit();
+}
+
+</script>
+</head>
+<body>
+<h3>Search For new job   <button type='button' onClick='searchButtonHandler()'>Search</button></h3>
+<h3>My Profile           <button type='button' onClick='profileButtonHandler()'>Profile</button></h3>
+<form action='/profile/search_page' id='search_page'></form>
+<form action='/profile/view_profile_page' id='view_profile'></form>
+</body>
+</html>

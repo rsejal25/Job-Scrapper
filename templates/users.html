@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+#detailPanel{
+width:300px;
+height:80px;
+border:1px solid black;
+overflow:scroll;
+}
+table th,td{
+border:1px solid black;
+cursor:pointer;
+padding:5px;
+}
+table{
+border-collapse:collapse;
+}
+
+</style>
+<script>
+let arr=[];
+var currentPage=1;
+var numberPerPage=5;
+var numberOfPages=0;
+function Login_users(){
+this.username="";
+this.email="";
+}
+var login_users=[];
+
+function createRowHandler(row,username)
+{
+return function(){
+selectRow(row,username);
+}
+}
+var selectedRow=null;
+function selectRow(row,username){
+if(row==null) return;
+if(row==selectedRow) return;
+if(selectedRow!=null)
+{
+selectedRow.style.background="white";
+selectedRow.style.color="black";
+}
+row.style.background="black";
+row.style.color="white";
+selectedRow=row;
+let i=0;
+//alert(login_users.length);
+while(i<login_users.length)
+{
+if(login_users[i].username==username)
+{
+document.getElementById('usernameSection').innerHTML=login_users[i].username;
+document.getElementById('emailSection').innerHTML=login_users[i].email;
+break;
+}
+i++;
+}
+}
+
+
+window.onload=load;
+function load(){
+loadTable();
+}
+
+function loadTable(){
+let xhr=new XMLHttpRequest();
+xhr.open('GET','/show');
+token=localStorage.getItem('unique_token');
+let users;
+xhr.onreadystatechange=function(){
+if(xhr.readyState==4)
+{
+if(this.status==401)
+{
+document.getElementById('login').submit();
+}
+if(this.status==200)
+{
+console.log(this.status);
+let responseObj=xhr.response;
+//responseObj=JSON.parse(responseObj);
+//alert(responseObj.users.length);
+let section=document.querySelector('section');
+let table1=document.querySelectorAll("table")[0];
+if(table1!=undefined) table1.remove();
+let table=document.createElement("table");
+let tblBody=document.createElement("tbody");
+let thead=document.createElement('thead');
+let th=document.createElement('th');
+let tr=document.createElement('tr');
+let td=document.createElement('td');
+td.innerHTML="Username";
+tr.appendChild(td);
+td=document.createElement('td');
+td.innerHTML="Email";
+tr.appendChild(td);
+td=document.createElement('td');
+td.innerHTML="Address";
+tr.appendChild(td);
+td=document.createElement('td');
+td.innerHTML="Update";
+tr.appendChild(td);
+td=document.createElement('td');
+td.innerHTML="Delete";
+tr.appendChild(td);
+th.appendChild(tr);
+thead.appendChild(tr);
+table.appendChild(thead);
+for(let i=0;i<responseObj.length;i++)
+{
+users=new Login_users();
+console.log(responseObj[i].username);
+users.username=responseObj[i].username;
+users.email=responseObj[i].email;
+login_users[i]=users;
+let row=document.createElement("tr");
+let cell=document.createElement("td");
+let cellText=document.createTextNode(responseObj[i].username);
+cell.appendChild(cellText);
+row.appendChild(cell);
+cell=document.createElement("td");
+cellText=document.createTextNode(responseObj[i].email);
+cell.appendChild(cellText);
+row.appendChild(cell);
+cell=document.createElement("td");
+cellText=document.createTextNode(responseObj[i].address);
+cell.appendChild(cellText);
+row.appendChild(cell);
+
+cell=document.createElement("td");
+cellText=document.createTextNode("update");
+var link=document.createElement('a');
+link.appendChild(cellText)
+link.title='update';
+link.href='/update_form?id='+responseObj[i].id;
+cell.appendChild(link);
+row.appendChild(cell);
+cell=document.createElement("td");
+cellText=document.createTextNode("delete");
+var link=document.createElement('a');
+link.appendChild(cellText)
+link.title='delete';
+link.href='/delete_form?id='+responseObj[i].id;
+cell.appendChild(link);
+row.appendChild(cell);
+row.onclick=createRowHandler(row,responseObj[i].username);
+
+tblBody.appendChild(row);
+}
+table.appendChild(tblBody);
+table.setAttribute("border","3");
+section.append(table);
+}
+}
+}
+//xhr.setRequestHeader('Content-type','application/json;charset=utf-8');
+
+xhr.setRequestHeader('Authorization','JWT '+token);
+xhr.responseType='json';
+xhr.send();
+
+}
+function logoutFunction(){
+alert('logged out');
+localStorage.removeItem('unique_token');
+document.getElementById('login').submit();
+}
+</script>
+<head>
+<body>
+<center><h3>Registered Users</h3>
+<br>
+<center><button type='button' onClick='logoutFunction()'>Logout</button></center>
+<br>
+<section>
+</section>
+<br>
+<br>
+<br>
+<div id='detailPanel'>
+<h4 style='padding-left:5px;padding-right:5px;'>Details Panel</h4>
+
+<p>username : <span id='usernameSection'></span></p>
+<p>email : <span id='emailSection'></span></p>
+</div>
+</center>
+<form id='login' action='/login_form'></form>
+</body>
+</html>
